@@ -1,0 +1,90 @@
+
+pk data
+
+[rank: 0] Seed set to 123
+[train] Vulnerable: 1641, Non-Vulnerable: 13865
+---> Checking graphs for train:   0%|          | 0/2000 [00:00<?, ?it/s]
+---> Checking graphs for train:   4%|▎         | 73/2000 [00:00<00:02, 729.64it/s]
+---> Checking graphs for train:   7%|▋         | 148/2000 [00:00<00:02, 739.43it/s]
+---> Checking graphs for train:  12%|█▏        | 232/2000 [00:00<00:02, 780.07it/s]
+---> Checking graphs for train:  16%|█▌        | 310/2000 [00:00<00:02, 748.12it/s]
+---> Checking graphs for train:  21%|██▏       | 427/2000 [00:00<00:01, 895.51it/s]
+---> Checking graphs for train:  28%|██▊       | 553/2000 [00:00<00:01, 1010.30it/s]
+---> Checking graphs for train:  33%|███▎      | 655/2000 [00:00<00:01, 951.11it/s] 
+---> Checking graphs for train:  38%|███▊      | 751/2000 [00:00<00:01, 884.18it/s]
+---> Checking graphs for train:  42%|████▏     | 841/2000 [00:01<00:01, 692.89it/s]
+---> Checking graphs for train:  48%|████▊     | 959/2000 [00:01<00:01, 809.82it/s]
+---> Checking graphs for train:  54%|█████▍    | 1080/2000 [00:01<00:01, 908.10it/s]
+---> Checking graphs for train:  59%|█████▉    | 1178/2000 [00:01<00:00, 846.50it/s]
+---> Checking graphs for train:  65%|██████▌   | 1300/2000 [00:01<00:00, 937.72it/s]
+---> Checking graphs for train:  70%|██████▉   | 1399/2000 [00:01<00:00, 841.48it/s]
+---> Checking graphs for train:  74%|███████▍  | 1489/2000 [00:01<00:00, 731.80it/s]
+---> Checking graphs for train:  83%|████████▎ | 1666/2000 [00:01<00:00, 970.48it/s]
+---> Checking graphs for train:  89%|████████▊ | 1773/2000 [00:02<00:00, 916.05it/s]
+---> Checking graphs for train:  95%|█████████▌| 1902/2000 [00:02<00:00, 1006.51it/s]
+---> Checking graphs for train: 100%|██████████| 2000/2000 [00:02<00:00, 862.04it/s] 
+[val] Vulnerable: 201, Non-Vulnerable: 1737
+---> Checking graphs for val:   0%|          | 0/1938 [00:00<?, ?it/s]
+
+---> Checking graphs for val: 100%|██████████| 1938/1938 [00:02<00:00, 770.69it/s]
+[test] Vulnerable: 195, Non-Vulnerable: 1744
+---> Checking graphs for test:   0%|          | 0/1939 [00:00<?, ?it/s]
+
+---> Checking graphs for test: 100%|██████████| 1939/1939 [00:03<00:00, 520.40it/s]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+HPU available: False, using: 0 HPUs
+[rank: 0] Seed set to 123
+Initializing distributed: GLOBAL_RANK: 0, MEMBER: 1/1
+----------------------------------------------------------------------------------------------------
+distributed_backend=nccl
+All distributed processes registered. Starting with 1 processes
+----------------------------------------------------------------------------------------------------
+
+/home/Rosmael/.venvb/lib64/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:652: Checkpoint directory /home/Rosmael/Modeling-GL/PKBdata/SCVdet/sourcescripts/storage/cache/checkpoints exists and is not empty.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1,2,3]
+
+  | Name    | Type                  | Params | Mode 
+----------------------------------------------------------
+0 | model   | MultiTaskGAT          | 6.2 M  | train
+1 | loss_fn | LearnableWeightedLoss | 0      | train
+----------------------------------------------------------
+6.2 M     Trainable params
+0         Non-trainable params
+6.2 M     Total params
+24.695    Total estimated model params size (MB)
+SLURM auto-requeueing enabled. Setting signal handlers.
+Running 1 trials...
+
+=== Trial 1 ===
+Sanity Checking: |          | 0/? [00:00<?, ?it/s]
+Sanity Checking:   0%|          | 0/2 [00:00<?, ?it/s]
+Sanity Checking DataLoader 0:   0%|          | 0/2 [00:00<?, ?it/s]
+Sanity Checking DataLoader 0:  50%|█████     | 1/2 [00:00<00:00,  3.73it/s]
+Sanity Checking DataLoader 0: 100%|██████████| 2/2 [00:00<00:00,  7.17it/s]
+                                                                           
+
+Training: |          | 0/? [00:00<?, ?it/s]
+Training:   0%|          | 0/456 [00:00<?, ?it/s]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_func_acc         0.8839285969734192
+      test_func_f1          0.46919432282447815
+   test_func_precision      0.44897958636283875
+    test_func_recall        0.4913151264190674
+      test_node_acc         0.7610589861869812
+      test_node_f1          0.4606491029262543
+   test_node_precision      0.5059433579444885
+    test_node_recall        0.5473957061767578
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[INFO] Function-level evaluation metrics:
+function_accuracy: 0.8906
+function_precision: 0.5335
+function_f1: 0.4906
+function_recall: 0.5049
+vulnerable_nodes_ratio_mean: 0.4632
+

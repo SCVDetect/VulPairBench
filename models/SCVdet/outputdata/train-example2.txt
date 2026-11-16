@@ -1,0 +1,95 @@
+[rank: 0] Seed set to 123
+[train] Vulnerable: 1641, Non-Vulnerable: 13865
+---> Checking graphs for train:   0%|          | 0/2000 [00:00<?, ?it/s]
+---> Checking graphs for train:  13%|█▎        | 265/2000 [00:00<00:00, 2649.91it/s]
+---> Checking graphs for train:  28%|██▊       | 555/2000 [00:00<00:00, 2793.17it/s]
+---> Checking graphs for train:  42%|████▏     | 848/2000 [00:00<00:00, 2854.99it/s]
+---> Checking graphs for train:  57%|█████▋    | 1136/2000 [00:00<00:00, 2862.22it/s]
+---> Checking graphs for train:  71%|███████▏  | 1427/2000 [00:00<00:00, 2876.75it/s]
+---> Checking graphs for train:  86%|████████▌ | 1715/2000 [00:00<00:00, 2853.15it/s]
+---> Checking graphs for train: 100%|██████████| 2000/2000 [00:00<00:00, 2846.38it/s]
+[val] Vulnerable: 201, Non-Vulnerable: 1737
+---> Checking graphs for val:   0%|          | 0/1938 [00:00<?, ?it/s]
+---> Checking graphs for val:  15%|█▍        | 287/1938 [00:00<00:00, 2869.09it/s]
+---> Checking graphs for val:  30%|██▉       | 578/1938 [00:00<00:00, 2887.84it/s]
+---> Checking graphs for val:  45%|████▍     | 867/1938 [00:00<00:00, 2887.84it/s]
+---> Checking graphs for val:  60%|█████▉    | 1156/1938 [00:00<00:00, 2863.04it/s]
+---> Checking graphs for val:  74%|███████▍  | 1443/1938 [00:00<00:00, 2807.65it/s]
+---> Checking graphs for val:  89%|████████▉ | 1732/1938 [00:00<00:00, 2834.30it/s]
+---> Checking graphs for val: 100%|██████████| 1938/1938 [00:00<00:00, 2855.07it/s]
+[test] Vulnerable: 195, Non-Vulnerable: 1744
+---> Checking graphs for test:   0%|          | 0/1939 [00:00<?, ?it/s]
+---> Checking graphs for test:  15%|█▍        | 290/1939 [00:00<00:00, 2896.52it/s]
+---> Checking graphs for test:  30%|██▉       | 580/1939 [00:00<00:00, 2841.06it/s]
+---> Checking graphs for test:  45%|████▍     | 868/1939 [00:00<00:00, 2855.48it/s]
+---> Checking graphs for test:  60%|█████▉    | 1157/1939 [00:00<00:00, 2867.35it/s]
+---> Checking graphs for test:  74%|███████▍  | 1444/1939 [00:00<00:00, 2857.71it/s]
+---> Checking graphs for test:  89%|████████▉ | 1730/1939 [00:00<00:00, 2855.73it/s]
+---> Checking graphs for test: 100%|██████████| 1939/1939 [00:00<00:00, 2849.18it/s]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+HPU available: False, using: 0 HPUs
+[rank: 0] Seed set to 123
+Initializing distributed: GLOBAL_RANK: 0, MEMBER: 1/1
+----------------------------------------------------------------------------------------------------
+distributed_backend=nccl
+All distributed processes registered. Starting with 1 processes
+----------------------------------------------------------------------------------------------------
+
+/home/Rosmael/.venvb/lib64/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:652: Checkpoint directory /home/Rosmael/Modeling-GL/PKBdata/SCVdet/sourcescripts/storage/cache/checkpoints exists and is not empty.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1,2,3]
+
+  | Name    | Type                  | Params | Mode 
+----------------------------------------------------------
+0 | model   | MultiTaskGAT          | 6.9 M  | train
+1 | loss_fn | LearnableWeightedLoss | 0      | train
+----------------------------------------------------------
+6.9 M     Trainable params
+0         Non-trainable params
+6.9 M     Total params
+27.501    Total estimated model params size (MB)
+SLURM auto-requeueing enabled. Setting signal handlers.
+Running 1 trials...
+
+=== Trial 1 ===
+Sanity Checking: |          | 0/? [00:00<?, ?it/s]
+Sanity Checking:   0%|          | 0/2 [00:00<?, ?it/s]
+Sanity Checking DataLoader 0:   0%|          | 0/2 [00:00<?, ?it/s]
+Sanity Checking DataLoader 0:  50%|█████     | 1/2 [00:00<00:00,  1.79it/s]
+Sanity Checking DataLoader 0: 100%|██████████| 2/2 [00:00<00:00,  3.49it/s]
+                                                                           
+
+Training: |          | 0/? [00:00<?, ?it/s]
+
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+HPU available: False, using: 0 HPUs
+[rank: 0] Seed set to 123
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1,2,3]
+SLURM auto-requeueing enabled. Setting signal handlers.
+/home/rz.lekeufack/Rosmael/.venvb/lib64/python3.9/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:215: Using `DistributedSampler` with the dataloaders. During `trainer.test()`, it is recommended to use `Trainer(devices=1, num_nodes=1)` to ensure each sample/batch gets evaluated exactly once. Otherwise, multi-device settings use `DistributedSampler` that replicates some samples to make sure all devices have same batch size in case of uneven inputs.
+
+
+[INFO] Best model saved to: /home/Rosmael/Modeling-GL/PKBdata/SCVdet/sourcescripts/storage/cache/checkpoints/best_model.ckpt with val_f1 = 0.6782
+[INFO] Best config: {'in_feats': 768, 'hidden_feats': 525, 'num_heads': 4, 'dropout': 0.4, 'lr': 1e-05, 'embedd_method': 'Codebert', 'glmethod': 'attention', 'rand_feat_dim': 100, 'func_emb_dim': 768, 'embed_dim': 768, 'method': 'linelevel'}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_func_acc         0.7879464030265808
+      test_func_f1          0.6764359474182129
+   test_func_precision      0.6607142686843872
+    test_func_recall        0.8821340203285217
+      test_node_acc         0.3766756057739258
+      test_node_f1           0.288973331451416
+   test_node_precision      0.4967304468154907
+    test_node_recall        0.4656257629394531
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[INFO] Function-level evaluation metrics:
+function_accuracy: 0.7728
+function_precision: 0.6533
+function_f1: 0.6624
+function_recall: 0.8737
+vulnerable_nodes_ratio_mean: 0.7125

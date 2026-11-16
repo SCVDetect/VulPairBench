@@ -1,0 +1,21 @@
+{
+  "run_id": "pilot01",
+  "dataset": {
+    "name": "PairVul",
+    "official_test_split_sha256": null,
+    "source_manifest_sha256": null,
+    "training_overlap_audited": false
+  },
+  "model": "SCVdet",
+  "checkpoint_sha256": null,
+  "training_dataset": null,
+  "training_partition_manifest_sha256": null,
+  "architecture_config": null,
+  "graph_or_tokenizer_configuration": null,
+  "joern_version_if_applicable": null,
+  "inference_threshold": null,
+  "seed": null,
+  "hardware": null,
+  "code_commit": null,
+  "notes": "Fill these fields from actual records before reporting scientific results."
+}
