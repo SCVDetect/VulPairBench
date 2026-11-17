@@ -1,0 +1,9 @@
+# Compatibility fix for the author's README: transformers 4.34.0 requires tokenizers 0.14.x.
+# Not a reimplementation: all model architecture/hyperparameter settings remain original.
+torch==2.1.0
+transformers==4.34.0
+tokenizers==0.14.1
+numpy==1.26.3
+pandas==2.2.0
+scikit-learn==1.3.2
+tqdm==4.66.1

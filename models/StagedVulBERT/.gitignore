@@ -1,0 +1,24 @@
+# Local environment
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.idea/
+# Downloaded model weights and intermediate artifacts
+checkpoints/**/*.bin
+checkpoints/**/*.pt
+checkpoints/**/*.pth
+checkpoints/**/*.ckpt
+resource/staged-models/*.bin
+resource/codebert-base/*.bin
+resource/codebert-base/*.safetensors
+resource/dataset/*.csv
+resource/dataset/*.pkl
+# Original experiment products
+new_model/
+log/
+*__pycache__/
+*_lp.pkl
+*.log
+# Parent VulPairBench repo should ignore Results/StagedVulBERT/* except README
