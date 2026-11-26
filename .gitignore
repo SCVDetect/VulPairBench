@@ -15,6 +15,7 @@ __pycache__/
 venv/
 .idea/
 .vscode/
+models/SCVdet/sourcescripts/storage/external/samples.csv
 
 # All outputs organized per model/run (the README files remain tracked)
 Results/*/*
@@ -53,6 +54,8 @@ models/*/sourcescripts/storage/external/*.safetensors
 models/*/sourcescripts/storage/external/*.sqlite
 # LineVul - generated C/C++ samples for Cppcheck
 /models/LineVul/cppcheck/data/c_files/
+models/LineVul/linevul/saved_models/checkpoint-best-f1/12heads_linevul_model.bin
+
 
 # LineVul - generated static-analysis outputs
 /models/LineVul/cppcheck/output.txt

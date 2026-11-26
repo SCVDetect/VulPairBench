@@ -575,8 +575,8 @@ def train_with_param_trials(df, graph_dir, config_grid):
     val_loader = GraphDataLoader(val_set, batch_size=1, num_workers=num_cpus)
     test_loader = GraphDataLoader(test_set, batch_size=1, num_workers=num_cpus)
 
-    best_mo_path = f"{utls.checkpoints_dir()}/best_confir.json"
-    best_model_path = f"{utls.checkpoints_dir()}/best_model.ckpt"
+    best_mo_path = f"{utls.outputs_dir()}/best_confir.json"
+    best_model_path = f"{utls.cache_dir()}/checkpoints/best_model.ckpt"
 
     if os.path.exists(best_mo_path) and os.path.exists(best_model_path):
         print("[Infos] Loading from pre-trained best config...")
@@ -620,7 +620,7 @@ def train_with_param_trials(df, graph_dir, config_grid):
         node_pos_weight = compute_node_class_weights(train_set)
         model = LitSvulDetGAT(trial_config, v1, node_pos_weight)
 
-        checkpoint_path = f"{utls.checkpoints_dir()}/trial_{idx+1}/best_model.ckpt"
+        checkpoint_path = f"{utls.cache_dir()}/checkpoints/trial_{idx+1}.ckpt"
         checkpoint_callback = ModelCheckpoint(
             monitor=config_grid['check_monitor'],
             dirpath=os.path.dirname(checkpoint_path),

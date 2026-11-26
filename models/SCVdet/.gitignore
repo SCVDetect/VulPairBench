@@ -196,3 +196,21 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# VulPairBench: preserve lightweight checkpoint instructions, not model weights
+/checkpoints/*
+!/checkpoints/README.md
+*.ckpt
+*.pth
+*.pt
+*.bin
+*.safetensors
+# All external data and Joern runtime assets are machine-local
+/sourcescripts/storage/external/*
+!/sourcescripts/storage/external/get_func_graph.scala
+# PairVul graph processing / generated features (also covered above)
+/sourcescripts/storage/processed/
+/sourcescripts/storage/cache/
+/sourcescripts/storage/interim/
+/sourcescripts/storage/outputs/
+/sourcescripts/storage/logs/

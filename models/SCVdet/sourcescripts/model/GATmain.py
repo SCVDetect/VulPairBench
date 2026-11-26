@@ -297,12 +297,12 @@ def train_with_param_trials(df, graph_dir, config_grid):
     val_loader = GraphDataLoader(val_set, batch_size=1,  num_workers=num_cpus)
     test_loader = GraphDataLoader(test_set, batch_size=1,  num_workers=num_cpus)
 
-    final_model_path = f"{utls.checkpoints_dir()}/final_model_{str(config_grid['max_epochs'])}epochs.ckpt"
+    final_model_path = f"{utls.outputs_dir()}/final_model_{str(config_grid['max_epochs'])}epochs.ckpt"
     
     if os.path.exists(final_model_path):
         best_val_f1 = 0
         best_model_path = None
-        best_config = Savebestconfig.load_from_json(f"{utls.checkpoints_dir()}/best_confir.json")
+        best_config = Savebestconfig.load_from_json(f"{utls.outputs_dir()}/best_confir.json")
     else: 
         best_val_f1 = 0
         best_model_path = None
@@ -324,7 +324,7 @@ def train_with_param_trials(df, graph_dir, config_grid):
         }
 
         model = LitSvulDetGAT(trial_config)
-        checkpoint_path = f"{utls.checkpoints_dir()}/trial_{idx+1}.ckpt"
+        checkpoint_path = f"{utls.cache_dir()}/checkpoints/trial_{idx+1}.ckpt"
 
         checkpoint_callback = ModelCheckpoint(
             monitor= config_grid['check_monitor'], #   'val_f1', # val_acc, val_f1
@@ -349,7 +349,7 @@ def train_with_param_trials(df, graph_dir, config_grid):
         )
         
         # new code to stop the trainin
-        final_model_path = f"{utls.checkpoints_dir()}/final_model_{str(config_grid['max_epochs'])}epochs.ckpt"
+        final_model_path = f"{utls.outputs_dir()}/final_model_{str(config_grid['max_epochs'])}epochs.ckpt"
         if not os.path.exists(final_model_path):
             trainer.fit(model, train_loader, val_loader)
             
@@ -375,7 +375,7 @@ def train_with_param_trials(df, graph_dir, config_grid):
     
     print(f"Best config: {best_config}\n[Infos] Saved")
     # Save best Config
-    Savebestconfig.save_to_json(best_config, f"{utls.checkpoints_dir()}/best_confir.json")
+    Savebestconfig.save_to_json(best_config, f"{utls.outputs_dir()}/best_confir.json")
 
     print("\n=== Retraining Best Model for max Epochs ===")
     seed_everything(42)
@@ -389,7 +389,7 @@ def train_with_param_trials(df, graph_dir, config_grid):
     
 
     # train model and test
-    final_model_path = f"{utls.checkpoints_dir()}/final_model_{str(config_grid['max_epochs'])}epochs.ckpt"
+    final_model_path = f"{utls.outputs_dir()}/final_model_{str(config_grid['max_epochs'])}epochs.ckpt"
     if os.path.exists(final_model_path):
         
         # Load and test final model
@@ -403,7 +403,7 @@ def train_with_param_trials(df, graph_dir, config_grid):
         print("[Infos] Training")
         final_trainer.fit(final_model, train_loader, val_loader)
         # Save final model checkpoint
-        final_model_path = f"{utls.checkpoints_dir()}/final_model_{str(config_grid['max_epochs'])}epochs.ckpt"
+        final_model_path = f"{utls.outputs_dir()}/final_model_{str(config_grid['max_epochs'])}epochs.ckpt"
         final_trainer.save_checkpoint(final_model_path)
         print(f"Saved final model at: {final_model_path}")
         # Save final training history plot
@@ -411,7 +411,7 @@ def train_with_param_trials(df, graph_dir, config_grid):
         plt.xlabel("Epoch")
         plt.ylabel("Validation F1")
         plt.title(f"Final Training F1 History ({str(config_grid['max_epochs'])} Epochs)")
-        plt.savefig(f"{utls.checkpoints_dir()}/final_model_f1_history.png")
+        plt.savefig(f"{utls.outputs_dir()}/final_model_f1_history.png")
         plt.close()
         # Load and test final model
         final_model = LitSvulDetGAT.load_from_checkpoint(final_model_path, config=best_config)

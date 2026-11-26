@@ -237,7 +237,7 @@ def train_with_param_trials(df, graph_dir, config_grid, max_epochs=5):
         }
 
         model = LitSvulDetGAT(trial_config)
-        checkpoint_path = f"{utls.checkpoints_dir()}/trial_{idx+1}.ckpt"
+        checkpoint_path = f"{utls.cache_dir()}/checkpoints/trial_{idx+1}.ckpt"
 
         checkpoint_callback = ModelCheckpoint(
             monitor='val_f1',

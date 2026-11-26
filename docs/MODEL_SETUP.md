@@ -25,7 +25,7 @@ Use a distinct `VULPAIR_RUN_ID` for each experiment, dataset version, checkpoint
 Illustrative CLI after obtaining a checkpoint and its matching base config/tokenizer (edit paths as needed):
 
 ```bash
-python scripts/run_model.py --model LineVul --run-id pilot01 -- \
+python3 scripts/run_model.py --model LineVul --run-id pilot01 -- \
   --do_test --write_raw_preds \
   --model_name_or_path microsoft/codebert-base \
   --tokenizer_name microsoft/codebert-base \

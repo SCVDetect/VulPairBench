@@ -458,12 +458,12 @@ def train_with_param_trials(df, graph_dir, config_grid):
     train_loader = GraphDataLoader(train_set, batch_size=1, shuffle=True, num_workers=num_cpus)
     val_loader = GraphDataLoader(val_set, batch_size=1, num_workers=num_cpus)
     test_loader = GraphDataLoader(test_set, batch_size=1, num_workers=num_cpus)
-    best_mo_path = f"{utls.checkpoints_dir()}/best_confir.json"
+    best_mo_path = f"{utls.outputs_dir()}/best_confir.json"
     
     if os.path.exists(best_mo_path):
         print("[Infos] Loading from pre-trained best config...")
         best_config = Savebestconfig.load_from_json(best_mo_path)
-        best_model_path = f"{utls.checkpoints_dir()}/best_model.ckpt"
+        best_model_path = f"{utls.cache_dir()}/checkpoints/best_model.ckpt"
         seed_everything(123)
         final_model = LitSvulDetGAT.load_from_checkpoint(best_model_path, config=best_config)
         final_trainer = Trainer(logger=False, enable_progress_bar=True)
@@ -498,7 +498,7 @@ def train_with_param_trials(df, graph_dir, config_grid):
         model = LitSvulDetGAT(trial_config, v1, node_pos_weight)
         # model = LitSvulDetGAT(trial_config, v1)
 
-        checkpoint_path = f"{utls.checkpoints_dir()}/trial_{idx+1}/best_model.ckpt"
+        checkpoint_path = f"{utls.cache_dir()}/checkpoints/trial_{idx+1}.ckpt"
 
         checkpoint_callback = ModelCheckpoint(
             monitor=config_grid['check_monitor'],  # 'val_f1'
@@ -547,7 +547,7 @@ def train_with_param_trials(df, graph_dir, config_grid):
     Savebestconfig.save_to_json(best_config, best_mo_path)
 
     if best_model_path and os.path.exists(best_model_path):
-        shutil.copy(best_model_path, f"{utls.checkpoints_dir()}/best_model.ckpt")
+        shutil.copy(best_model_path, f"{utls.cache_dir()}/checkpoints/best_model.ckpt")
 
     print("\n=== Testing the best model on test set ===")
     seed_everything(123)
@@ -695,10 +695,10 @@ if __name__ == '__main__':
     train_with_param_trials(df, graph_dir, config_grid)
     
     
-    best_mo_path = f"{utls.checkpoints_dir()}/best_confir.json"
+    best_mo_path = f"{utls.outputs_dir()}/best_confir.json"
     if os.path.exists(best_mo_path):
         best_config = Savebestconfig.load_from_json(best_mo_path)
-        best_model_path = f"{utls.checkpoints_dir()}/best_model.ckpt"
+        best_model_path = f"{utls.cache_dir()}/checkpoints/best_model.ckpt"
         final_model = LitSvulDetGAT.load_from_checkpoint(best_model_path, config=best_config)
         
         # Perform function-level evaluation

@@ -1,0 +1,29 @@
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+# Training and evaluation artifacts
+/work/*
+!/work/.gitkeep
+/checkpoints/*
+!/checkpoints/function_level/
+!/checkpoints/vocab/
+/checkpoints/function_level/*
+!/checkpoints/function_level/.gitkeep
+/checkpoints/vocab/*
+!/checkpoints/vocab/.gitkeep
+/FiCoVuL/data/
+/Doxygen/Data/
+/Doxygen/data/
+/Doxygen/joern-cli/bin/
+/Doxygen/joern-cli/lib/
+*.pth
+*.pt
+*.ckpt
+*.bin
+*.log
+# Relative run outputs should be in VulPairBench/Results/FiCoVuL

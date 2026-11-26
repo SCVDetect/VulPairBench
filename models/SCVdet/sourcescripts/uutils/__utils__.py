@@ -48,21 +48,21 @@ def processed_dir() -> Path:
     return path
 
 def outputs_dir() -> Path:
-    """Model result artifacts; never store checkpoints here."""
-    root = Path(__file__).resolve().parents[4]
-    # .../VulPairBench/models/SCVdet/sourcescripts/uutils/file.py
-    run_id = os.environ.get("VULPAIR_RUN_ID", "unversioned")
+    """Keep runtime results outside the source tree in VulPairBench/Results/SCVdet."""
+    repo = Path(__file__).resolve().parents[4]
+    run_id = os.environ.get("VULPAIR_RUN_ID", "legacy_unversioned")
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", run_id) or run_id in (".", ".."):
-        raise ValueError("Invalid VULPAIR_RUN_ID: use letters, numbers, dot, dash or underscore")
-    path = root / "Results" / "SCVdet" / run_id
-    path.mkdir(parents=True, exist_ok=True)
+        raise ValueError("Invalid VULPAIR_RUN_ID")
+    path = repo / "Results" / "SCVdet" / run_id
+    path.mkdir(exist_ok=True, parents=True)
     return path
 
 
 def checkpoints_dir() -> Path:
-    """Private local checkpoint directory, outside tracked Results."""
-    path = Path(__file__).resolve().parents[2] / "checkpoints"
-    path.mkdir(parents=True, exist_ok=True)
+    """Store training weights in models/SCVdet/checkpoints, not Results."""
+    override = os.environ.get("SCVDET_CHECKPOINT_DIR")
+    path = Path(override).expanduser().resolve() if override else Path(__file__).resolve().parents[2] / "checkpoints"
+    path.mkdir(exist_ok=True, parents=True)
     return path
 
 def cache_dir() -> Path:

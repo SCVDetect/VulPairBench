@@ -1,79 +1,127 @@
-> **VulPairBench integration note.** This is the original SCVdet implementation preserved under `models/SCVdet/`. Primary entry point: `sourcescripts/model/scvuldetect.py`. Results are routed to `../../Results/SCVdet/<run-id>/` (from this README directory); checkpoints and downloads remain local. Follow [project setup](../../docs/MODEL_SETUP.md) and [study workflow](../../docs/WORKFLOW.md) before executing original commands. Those commands may reference paths relative to the model directory.
+# SCVdet — VulPairBench paired-code runner
 
----
+This folder retains the authors' **SCVdet** GNN architecture and original training scripts, with an additional **inference-only paired benchmark adapter** in [`scripts/run_pairvul.py`](scripts/run_pairvul.py). Source: [original implementation](README_UPSTREAM.md). This distribution preserves the training entry point but **does not bundle datasets, embeddings, checkpoints, or Joern executables**.
 
-# SCVdet  
+The new adapter evaluates **both versions of every pair** (`before` = label 1, `after` = label 0) using the same source-code samples as LineVul and StagedVulBERT. Crucially, it does *not* call the legacy `dataset()` loader, which uses BigVul data, transforms source code, and assigns its own splits. It does *not* call the legacy `graphconstruction.py` runner, which builds model graphs from `before` only.
 
-#### Modeling Function-Level Relationships for Vulnerability Detection in Graph Neural Networks
+## Quick start (from VulPairBench root)
 
-This repository contains the implementation of our GNN model for vulnerability detection by modeling function-level relationships in source code.  
+Activate your existing **SCVdet virtual environment**. For a preflight report, no DGL or GPU is required:
 
-## 1. Dataset  & Data Processing 
-We use real-world datasets constructed from Java, C/C++, and Python code:  
-- **Dataset 1**: ProjectKB  
-- **Dataset 2**: QEMU+FFmpeg  
-- **Dataset 3**: Big-Vul
-- **Dataset 4**: CVEFixes
-  
-For graph data extraction from source code, we use [**Joern**](https://joern.io/), an open-source code analysis tool. The automated extraction process is implemented in the provided scripts. Run ``` ./installJoernanddata.sh``` to install.
-
-```sh
-chmod +x installJoernanddata.sh
-./installJoernanddata.sh
+```bash
+python models/SCVdet/scripts/run_pairvul.py --stage check
 ```
 
-## 3. Function-Level Relationship Modeling  
-We approximate relationships using constructed graphs of individual source code functions.  
+Expected local assets:
 
-## Source Code Execution  
+- `models/SCVdet/checkpoints/best_model.ckpt` (trusted SCVdet Lightning checkpoint). `best_confir.json` is only needed if configuration is absent from the checkpoint hyperparameters.
+- `models/SCVdet/sourcescripts/storage/cache/embedmodel/CodeBERT/` (local HF model, including `config.json`; other supported paths: `cache/embedmodel/`, `Codebert/`, `codebert/`). Use `--codebert-path ...` if different.
+- `models/SCVdet/sourcescripts/storage/external/joern-cli/joern`. Use `--joern ...` if different.
+- `datasets/processed/pairvul_top10/samples.csv` prepared by the VulPairBench `scripts/prepare_pairvul.py`, with columns `sample_id`, `pair_id`, `version`, `label`, `processed_func` and optionally `source_sha256`, `cve_id`.
 
-### 1. Data Processing & Graph Extraction  
-The graph extraction time varies depending on the runtime environment and dataset size.  
-
-```sh
-cd sourcescripts  
-python3 -B ./processing/process.py  
-python3 -B ./processing/graphdata.py  
-```
-### 2. Node Feature Generation
-We train sequence-based models (CodeBERT, Word2Vec, and SBERT) to generate node features, and then construct graphs for model training. We provide the three fine-tuned models used for text embedding, as well as metadata extracted from Joern for the project KB graphs, which can be directly downloaded when ```./installJoernanddata.sh``` is run.
-
-To prepare the dataset, navigate to ```/storage/processed```, unzip the files, and delete all folders while keeping only the ```"before," "after,"``` and ```"eval"``` folders. Place these folders data in the ```storage/processed/dataset``` directory.
-
-```sh
-python3 -B ./processing/graphconstruction.py 
+**Pilot:** start with five complete pairs, keeping pilot caches isolated from the full experiment:
+ 
+```bash
+python models/SCVdet/scripts/run_pairvul.py \
+  --stage all \
+  --samples datasets/processed/pairvul_top10/samples.csv \
+  --dataset-tag pairvul_top10_pilot5 \
+  --run-id pairvul_top10_scvdet_pilot5 \
+  --limit-pairs 5 --strict
 ```
 
-### 3. Model Training & Testing
-The model is trained and tested at both function and statement levels. Output (```./stoarge/outputs/```) includes:
- - Classification metrics
- - A CSV of model predictions for each function
- - Detailed predictions per code line (with line numbers)
- - Unique function IDs and corresponding source code (stored in ``` ./storage/processed/before```)
+**Full dataset** (2,740 pairs, 5,480 graphs; extraction/embedding can take a long time):
 
-```sh
-python3 -B ./model/scvuldetect.py  
+```bash
+python models/SCVdet/scripts/run_pairvul.py \
+  --stage all \
+  --samples datasets/processed/pairvul_top10/samples.csv \
+  --dataset-tag pairvul_top10 \
+  --run-id pairvul_top10_scvdet_01
 ```
 
-### 4 Pre-trained Models
+For restarts or debugging, use distinct stages with the **same** `--dataset-tag` and `--run-id`:
 
-We provide a pre-trained model at the following link: [Download Pre-trained Model](https://drive.google.com/file/d/1UAC4Er_pPT5QPDVlUR6caxT7wWe9HBiM/view?usp=sharing). This includes full graphs constructed with project KB data, which can be used after downloading the complete package. 
-
-To set up the environment, create a virtual environment (with ```requirements.txt```) and run the following command to test the model:
-
-```sh
-python3 -B ./model/scvuldetect.py
+```bash
+python models/SCVdet/scripts/run_pairvul.py --stage prepare --dataset-tag pairvul_top10 --run-id pairvul_top10_scvdet_01
+python models/SCVdet/scripts/run_pairvul.py --stage extract --dataset-tag pairvul_top10 --run-id pairvul_top10_scvdet_01
+python models/SCVdet/scripts/run_pairvul.py --stage build   --dataset-tag pairvul_top10 --run-id pairvul_top10_scvdet_01
+python models/SCVdet/scripts/run_pairvul.py --stage predict --dataset-tag pairvul_top10 --run-id pairvul_top10_scvdet_01
 ```
 
-## Sample Output
-Go to ```outputdata/```
-#### 500-node dependency graph
-<img src="outputdata/RQ1/500sample_optimized_call_graph.png" alt="Model Output Example" width="200"/>
+python models/SCVdet/scripts/run_pairvul.py \
+  --stage predict \
+  --dataset-tag pairvul_top10 \
+  --run-id pairvul_top10_scvdet_cpu01 \
+  --device cpu
 
+`prepare` copies the **original code, including comments and preprocessor directives**, into independent `before/` and `after/` `.c` files. Paths are derived from a hash of the pair ID (not directly from potentially unsafe IDs), and all original IDs are retained in the manifest.
 
-#### ***Demo Video***--> Model inference on Bigvul 
-<a href="https://drive.google.com/file/d/1aBGnI94ltDb6vw95bdTPGIJ0BgoKJKop/view?usp=sharing" target="_blank">
-  <img src="outputdata/image.png" alt="Model Output Example" width="400"/>
-</a>
+`extract` invokes Joern once per `.c` file and checks for `.nodes.json` and `.edges.json`. It writes `joern_status.csv`, including failures. `build` uses SCVdet's original `feature_extraction(..., "pdg+raw")`, local CodeBERT embeddings, graph orientation and 100-dimensional random node features; it writes `graph_status.csv`. `predict` loads the **frozen checkpoint strictly**, refuses to recompute the model's training-derived `v1` vector on test samples, uses the **function-logit argmax** for classification, and records the node-aggregation decision only as secondary diagnostics.
 
+You can restart any stage. Existing Joern outputs and validated graph caches are reused unless you specify `--rebuild`. **Never reuse the same `--dataset-tag` after changing source code, checkpoint-relevant preprocessing, or embedding assets**; give it a new tag. `--rebuild` refreshes current inputs but does not erase old artifacts. `--strict` stops after a stage that has any failures; without it, failed samples and incomplete pairs are explicitly reported, never silently counted as evaluated.
 
+> **Do not run** the root `python scripts/run_model.py --model SCVdet` command for this paired test. That existing generic launcher targets the legacy `model/scvuldetect.py` workflow, not this new pair-aware pipeline. Use `models/SCVdet/scripts/run_pairvul.py` as above.
+
+## Files and results
+
+```text
+VulPairBench/
+├── datasets/processed/pairvul_top10/samples.csv             # Common benchmark input
+├── models/SCVdet/
+│   ├── scripts/run_pairvul.py                                # New paired workflow
+│   ├── checkpoints/best_model.ckpt                           # Supply separately
+│   └── sourcescripts/storage/
+│       ├── external/joern-cli/                               # Supply separately
+│       ├── cache/embedmodel/CodeBERT/                         # Supply separately
+│       ├── processed/<dataset-tag>/
+│       │   ├── before/<pair-hash>__before.c[.nodes.json, .edges.json]
+│       │   ├── after/<pair-hash>__after.c[.nodes.json, .edges.json]
+│       │   └── sample_manifest.csv
+│       └── cache/Graph/<dataset-tag>_svuldet_codebert_pdg+raw/
+│           └── <graph-id>                                    # DGL serialized graph per sample
+└── Results/SCVdet/<run-id>/
+    ├── joern_status.csv
+    ├── graph_status.csv
+    ├── predictions.csv                                       # Common benchmark schema
+    ├── raw_preds.csv
+    ├── function_level_predictions.csv
+    ├── prediction_failures.csv
+    ├── metrics.json
+    └── run_metadata.json
+```
+
+In `predictions.csv`, `sample_id`, `pair_id`, and `version` keep the vulnerable and patched samples distinct. `pred_label` / `func_level_pred` come from **SCVdet function logits**. `score_vulnerable` is class-1 softmax. `node_aggregate_pred` is the model's alternative *any-positive-node* rule and must **not** replace the primary function-level decision without an explicit experimental variant.
+
+**After inference**, use the shared evaluator from VulPairBench root:
+
+```bash
+python scripts/summarize_pairs.py \
+  --predictions Results/SCVdet/pairvul_top10_scvdet_01/predictions.csv \
+  --out-dir Results/comparisons/pairvul_top10_scvdet_01/SCVdet
+```
+
+`metrics.json` already reports pair coverage and class-level metrics, but using the exact same common evaluator as the other models is preferable for the study. Do **not** compute pair accuracy on only successful graphs without simultaneously reporting missing-graph coverage.
+
+## Important scientific limitations
+
+1. **Compatibility has not been proven on your server.** Python syntax, CPU-side preparation and mapping tests were run; the supplied archive contains no trained checkpoint, Joern binary, local embedding assets or DGL environment. Verify the first ten graphs and classification results before scaling up.
+2. **Joern version matters.** The original `storage/external/get_func_graph.scala` is preserved; an updated Joern may require Scala-script changes. Failed extraction is recorded, not masked.
+3. **Source preprocessing differs from the original SCVdet training data.** The paired workflow preserves source comments and formatting; the original preprocessing may remove comments and reconstruct patch lines. This is an intentional *raw-code baseline*, not proof of a matched training–test preprocessing regime. See [`docs/EXPERIMENT_PROTOCOL.md`](docs/EXPERIMENT_PROTOCOL.md).
+4. **Original graph construction uses randomly generated node features.** The adapter seeds these per sample so repeated runs reuse the same features. This improves reproducibility, but it is not a claim of identical runtime random draws to the original training experiment. The graph cache is input-specific.
+5. **No test-derived labels or learned context are used.** `_VULN` and `_FVULN` are placeholders in inference graphs; the original model's forward pass does not use them. The learned `v1` is recovered *only from the checkpoint*. Separate patches can change the graph embeddings and thus the predictions, but no trainable parameters are updated.
+6. **Original `_LINE` behavior is preserved.** SCVdet's upstream `feature_extraction()` returns Joern node IDs in a field named `lineno`; those are **not reliable source line numbers**. Do not interpret the `_LINE` field as patch-line coverage before a dedicated mapping fix.
+7. **Benchmark independence and leakage still need auditing.** These are exploratory PairVul candidate samples, not automatically the official held-out 586-pair split. Audit CVE and code overlap with the checkpoint training set before publication claims.
+
+## Training in a later phase
+
+The original training implementation is still present at `sourcescripts/model/scvuldetect.py`. The paired adapter does not train and will never silently start training. See **[`docs/TRAINING.md`](docs/TRAINING.md)** for how to reproduce legacy training using separate datasets, train/validation/test groups, annotated vulnerable lines, and dedicated checkpoint directories, plus the additional work needed for pair-aware training.
+
+## Infrastructure tests
+
+```bash
+python -m unittest discover -s models/SCVdet/tests -v
+python -m compileall -q models/SCVdet/scripts models/SCVdet/sourcescripts
+```
+
+For original authors' documentation and attribution, see [README_UPSTREAM.md](README_UPSTREAM.md).

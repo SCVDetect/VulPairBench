@@ -438,7 +438,10 @@ class Savebestconfig:
             return json.load(json_file)
         
 
-def get_or_compute_v1(df, config_grid, save_path=f"{utls.cache_dir()}/v1.npy"):
+def get_or_compute_v1(df, config_grid, save_path=None):
+    # Training-only dependency vector; avoid stale data-derived caches from another split.
+    if save_path is None:
+        save_path = str(utls.checkpoints_dir() / "v1.npy")
    
     def replace_nan_with_average(vec):
         nan_mask = np.isnan(vec)
@@ -527,7 +530,6 @@ class FunctionLevelEvaluator:
             with torch.no_grad():
                 node_logits, func_logits = self.model(g.to(self.device))
                 func_pred_la = torch.argmax(func_logits).item()
-                func_score = torch.softmax(func_logits, dim=-1).reshape(-1, 2)[0, 1].item()
                 node_probs = torch.softmax(node_logits, dim=1)
                 node_preds = (node_probs[:, 1] > threshold).long().cpu().numpy()
                 node_labels = g.ndata['_VULN'].long().cpu().numpy()
@@ -537,7 +539,6 @@ class FunctionLevelEvaluator:
                     'function_id': graph_id,
                     'true_label': true_label,
                     'func_level_pred': func_pred_la,
-                    'score_vulnerable': func_score,
                     'prediction': func_pred,
                     'vulnerable_nodes_ratio': np.mean(node_preds),
                     'node_labels': node_labels.tolist(),       
@@ -602,7 +603,7 @@ def train_with_param_trials(df, graph_dir, config_grid):
         # print("==============================\n")
         return
 
-    best_val_f1 = 0
+    best_val_f1 = float("-inf")
     best_config = None
     trials = list(product(config_grid['hidden_feats'], config_grid['dropout'], config_grid['lr']))
     print(f"Running {len(trials)} trials...")
@@ -628,10 +629,10 @@ def train_with_param_trials(df, graph_dir, config_grid):
         node_pos_weight = compute_node_class_weights(train_set)
         model = LitSvulDetGAT(trial_config, v1, node_pos_weight)
 
-        checkpoint_path = f"{utls.checkpoints_dir()}/trial_{idx+1}/best_model.ckpt"
+        checkpoint_path = utls.get_dir(utls.checkpoints_dir() / "trials" / f"trial_{idx+1}")
         checkpoint_callback = ModelCheckpoint(
             monitor=config_grid['check_monitor'],
-            dirpath=os.path.dirname(checkpoint_path),
+            dirpath=str(checkpoint_path),
             filename="best_model",
             save_top_k=1,
             mode='max',
@@ -681,9 +682,11 @@ def train_with_param_trials(df, graph_dir, config_grid):
     print("\n=== Testing the best model on test set ===")
     seed_everything(123)
     final_trainer = Trainer(logger=False, enable_progress_bar=True)
-    final_trainer.test(best_model, test_loader)
+    # Test the selected checkpoint, not the final epoch of its training trial.
+    selected_model = LitSvulDetGAT.load_from_checkpoint(best_model_path, config=best_config)
+    final_trainer.test(selected_model, test_loader)
 
-    evaluator = FunctionLevelEvaluator(best_model, config_grid)
+    evaluator = FunctionLevelEvaluator(selected_model, config_grid)
     metrics = evaluator.evaluate_function_level()
     print("\n\n[INFO] Function-level evaluation metrics:")
     for k, v in metrics.items():

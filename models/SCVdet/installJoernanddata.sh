@@ -17,13 +17,13 @@ fi
 
 #------ Bigvul data
 
-if [[ ! -f "MSR_data_cleaned.csv" ]]; then
-    gdown https://drive.google.com/uc\?id\=1-0VhnHBp9IGh90s2wCNjeCMuy70HPl8X
-    unzip MSR_data_cleaned.zip
-    rm MSR_data_cleaned.zip
-else
-    echo "Already downloaded bigvul data"
-fi
+# if [[ ! -f "MSR_data_cleaned.csv" ]]; then
+#     gdown https://drive.google.com/uc\?id\=1-0VhnHBp9IGh90s2wCNjeCMuy70HPl8X
+#     unzip MSR_data_cleaned.zip
+#     rm MSR_data_cleaned.zip
+# else
+#     echo "Already downloaded bigvul data"
+# fi
 
 cd .. 
 
@@ -37,12 +37,12 @@ mkdir cache -p
 
 cd cache
 
-if [[ ! -f "embedmodel" ]]; then
-    gdown https://drive.google.com/uc?id=1NLxOqBHrU2H3oswqBvjL-fn8Ipe2o7a0
-    unzip embedmodel.zip
-    rm embedmodel.zip
-else
-    echo "Already downloaded finetuned embedding model"
-fi
+# if [[ ! -f "embedmodel" ]]; then
+#     gdown https://drive.google.com/uc?id=1NLxOqBHrU2H3oswqBvjL-fn8Ipe2o7a0
+#     unzip embedmodel.zip
+#     rm embedmodel.zip
+# else
+#     echo "Already downloaded finetuned embedding model"
+# fi
 
 
